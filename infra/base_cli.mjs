@@ -1,4 +1,3 @@
-// import { program } from 'commander'
 import process from 'node:process'
 
 /**
@@ -117,9 +116,9 @@ function command(fn) {
             showCursor()
         } catch (e) {
             console.log(e)
-            throw new Error(e)
             printErrorMessage(e.message)
             showCursor()
+            throw new Error(e)
         }
     }
 }

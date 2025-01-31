@@ -1,6 +1,5 @@
 import {
     addCommand,
-    runProgram,
     startLoadingMessage,
     endLoadingMessage,
     clear,
@@ -27,7 +26,7 @@ addCommand({
         startLoadingMessage('Deploying Pipeline')
         const result = await deployInfra({
             name: config.default.name,
-            stage: '', // flags.stage,
+            stage: '',
             region: flags.region,
             template: template,
             outputs: []

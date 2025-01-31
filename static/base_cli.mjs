@@ -1,4 +1,3 @@
-// import { program } from 'commander'
 import process from 'node:process'
 
 /**

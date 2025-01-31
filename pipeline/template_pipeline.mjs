@@ -1,37 +1,12 @@
-// type SourcePlatform = 'code-commit' | 'github'
-
 // type SourceActionInput = {
 //     type: 'SOURCE'
 //     name: string
 //     repo: string
 //     outputArtifact: string
 //     owner?: string
-//     platform?: SourcePlatform
 // }
 
 const makeSourceAction = (config) => {
-    if (config.platform && config.platform == 'code-commit') {
-        return {
-            OutputArtifacts: [
-                {
-                    Name: config.outputArtifact
-                }
-            ],
-            InputArtifacts: [],
-            Name: 'source',
-            Configuration: {
-                RepositoryName: config.repo,
-                BranchName: 'main',
-                PollForSourceChanges: 'false'
-            },
-            ActionTypeId: {
-                Version: '1',
-                Provider: 'CodeCommit',
-                Category: 'Source',
-                Owner: 'AWS'
-            }
-        }
-    }
     if (!config.owner) {
         throw new Error('Github Source needs to have an owner defined')
     }

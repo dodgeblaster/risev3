@@ -3,7 +3,6 @@ import * as cli from './base_cli.mjs'
 import * as filesystem from './base_fs.mjs'
 import { deployStaticSite } from './deploy.mjs'
 import { getProjectData } from './get_project_data.mjs'
-//import { pull } from './pull.mjs'
 import process from 'node:process'
 
 const flags = [

@@ -1,6 +1,5 @@
 import {
     addCommand,
-    runProgram,
     startLoadingMessage,
     endLoadingMessage,
     clear,
@@ -29,7 +28,7 @@ addCommand({
         startLoadingMessage('Deploying Infra')
         const result = await deployInfra({
             name: config.default.name,
-            stage: '', // flags.stage,
+            stage: '', // not sure i believe in stages anymore. Your entire aws account is a stage
             region: flags.region,
             template: template,
             outputs: []
