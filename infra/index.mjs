@@ -4,7 +4,8 @@ import {
     endLoadingMessage,
     clear,
     hideCursor,
-    showCursor
+    showCursor,
+    runProgram
 } from './base_cli.mjs'
 import { deployInfra } from './deploy_infra.mjs'
 import * as filesystem from './base_fs.mjs'
@@ -15,10 +16,12 @@ addCommand({
         console.time('✅ Deployed Successfully \x1b[2mDeploy Time')
         hideCursor()
 
-        const config = await filesystem.getJsFile({
+        let config = await filesystem.getJsFile({
             path: '/rise.mjs',
             projectRoot: process.cwd()
         })
+
+        config = config.default
 
         const template = await filesystem.getTextContent({
             path: '/template.yml',
@@ -27,10 +30,10 @@ addCommand({
 
         startLoadingMessage('Deploying Infra')
         const result = await deployInfra({
-            name: config.default.name,
+            name: config.name,
             stage: '', // not sure i believe in stages anymore. Your entire aws account is a stage
-            region: flags.region,
-            template: template,
+            region: 'us-east-1,
+            template: JSON.stringifgy(template,null,2),
             outputs: []
         })
 
@@ -46,3 +49,5 @@ addCommand({
         showCursor()
     }
 })
+
+runProgram()
