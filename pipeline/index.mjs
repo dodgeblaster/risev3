@@ -4,7 +4,8 @@ import {
     endLoadingMessage,
     clear,
     hideCursor,
-    showCursor
+    showCursor,
+    runProgram
 } from './base_cli.mjs'
 import { deployInfra } from './deploy_infra.mjs'
 import * as filesystem from './base_fs.mjs'
@@ -16,19 +17,21 @@ addCommand({
         console.time('✅ Deployed Successfully \x1b[2mDeploy Time')
         hideCursor()
 
-        const config = await filesystem.getJsFile({
+        let config = await filesystem.getJsFile({
             path: '/pipeline.mjs',
             projectRoot: process.cwd()
         })
+
+        config = config.default
 
         const template = cfn(config)
 
         startLoadingMessage('Deploying Pipeline')
         const result = await deployInfra({
-            name: config.default.name,
+            name: config.name,
             stage: '',
-            region: flags.region,
-            template: template,
+            region: 'us-east-1',
+            template: JSON.stringify(template, null, 2),
             outputs: []
         })
 
@@ -44,3 +47,6 @@ addCommand({
         showCursor()
     }
 })
+
+
+runProgram()
