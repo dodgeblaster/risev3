@@ -20,16 +20,6 @@ phases:
     return script
 }
 
-const commands = [
-    'cd ./app',
-    `npm config set '//registry.npmjs.org/:_authToken' "\${NPM_TOKEN}"`,
-    `npm i`,
-    `npm publish`
-]
-
-const res = makeScript(commands)
-console.log(res)
-
 export default function makeCfn(def) {
     let template = {
         Resources: {
@@ -44,6 +34,7 @@ export default function makeCfn(def) {
         let actions = []
 
         for (const x of s.actions) {
+            console.log('asdlfkjasd', x)
             const valid = ['BUILD', 'SOURCE', 'INVOKE', 'APPROVAL', 'DEPLOY']
 
             if (!valid.includes(x.type)) {
