@@ -110,7 +110,7 @@ export function endLoadingMessage() {
 function command(fn) {
     return async () => {
         hideCursor()
-        clear()
+        // clear()
         try {
             await fn()
             showCursor()

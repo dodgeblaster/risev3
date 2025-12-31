@@ -33,7 +33,7 @@ addCommand({
             name: config.name,
             stage: '', // not sure i believe in stages anymore. Your entire aws account is a stage
             region: 'us-east-1',
-            template: JSON.stringifgy(template,null,2),
+            template: template,
             outputs: []
         })
 

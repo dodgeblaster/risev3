@@ -113,7 +113,7 @@ export async function deployInfra({ name, region, stage, template, outputs }) {
         /**
          * Check status of deployment
          */
-        io.cli.clear()
+        // io.cli.clear()
         io.cli.endLoadingMessage()
         io.cli.startLoadingMessage('Deploying CloudFormation Template')
 
@@ -126,7 +126,7 @@ export async function deployInfra({ name, region, stage, template, outputs }) {
                 backoffRate: 1.1,
                 maxRetries: 200,
                 onCheck: (resources) => {
-                    io.cli.clear()
+                    // io.cli.clear()
                     const cfStatus = formatCloudformationStatus(resources)
                     io.cli.print(cfStatus)
                     io.cli.endLoadingMessage()
@@ -168,7 +168,7 @@ export async function deployInfra({ name, region, stage, template, outputs }) {
             outputs: outputs
         })
 
-        io.cli.clear()
+        // io.cli.clear()
         io.cli.printSuccessMessage('Deployment Complete')
 
         return {

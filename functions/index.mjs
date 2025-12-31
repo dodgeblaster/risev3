@@ -106,6 +106,116 @@ export async function zipLambdaFunctions(rootFilePath) {
 }
 
 /**
+ * Scaffold
+ */
+async function scaffold() {
+    const riseConfig = `export default {
+    name: 'my-app',
+    functions: {
+        hello: './functions/hello.mjs',
+        scheduled: './functions/scheduled.mjs',
+        eventHandler: './functions/event-handler.mjs'
+    },
+    triggers: {
+        hello: 'API GET /hello',
+        scheduled: 'SCHEDULE 5',
+        /*
+        This means:
+        • **Trigger type**: EVENT (EventBridge)
+        • **Source**: my.service (the service that emits the event)
+        • **Event name**: order.created (the specific event type)
+        • **Event bus**: default (the EventBridge bus to listen on)
+        */
+        eventHandler: 'EVENT my.service order.created default'
+    },
+    api: {
+        authorizer: '{@output.auth-stack.CognitoUserPoolIssuer}'
+    }
+}`
+
+    const helloFunction = `export const config = {
+    timeout: 10,
+    env: {
+        NODE_ENV: 'production',
+        TABLE_NAME: '{@output.my-stack.TableName}',
+        BUCKET_NAME: '{@output.my-stack.BucketName}'
+    },
+    permissions: [
+        {
+            Effect: 'Allow',
+            Action: ['dynamodb:Query', 'dynamodb:PutItem', 'dynamodb:GetItem', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem'],
+            Resource: '{@output.my-stack.TableArn}'
+        },
+        {
+            Effect: 'Allow',
+            Action: ['s3:GetObject', 's3:PutObject'],
+            Resource: '{@output.my-stack.BucketArn}/*'
+        }
+    ]
+}
+
+export async function handler(event) {
+    return {
+        statusCode: 200,
+        body: JSON.stringify({ message: 'Hello World!' })
+    }
+}`
+
+    const scheduledFunction = `export const config = {
+    timeout: 30,
+    env: {
+        NODE_ENV: 'production'
+    }
+}
+
+export async function handler(event) {
+    console.log('Scheduled function executed:', new Date().toISOString())
+    return { success: true }
+}`
+
+    const eventFunction = `export const config = {
+    timeout: 15,
+    env: {
+        NODE_ENV: 'production'
+    }
+}
+
+export async function handler(event) {
+    console.log('Event received:', event)
+    return { processed: true }
+}`
+
+    await filesystem.makeDir({ path: '/functions', projectRoot: process.cwd() })
+    
+    filesystem.writeFile({
+        path: '/rise.mjs',
+        content: riseConfig,
+        projectRoot: process.cwd()
+    })
+    
+    filesystem.writeFile({
+        path: '/functions/hello.mjs',
+        content: helloFunction,
+        projectRoot: process.cwd()
+    })
+    
+    filesystem.writeFile({
+        path: '/functions/scheduled.mjs',
+        content: scheduledFunction,
+        projectRoot: process.cwd()
+    })
+    
+    filesystem.writeFile({
+        path: '/functions/event-handler.mjs',
+        content: eventFunction,
+        projectRoot: process.cwd()
+    })
+    
+    console.log('✅ Project scaffolded successfully!')
+    console.log('Run "rise deploy" to deploy your app')
+}
+
+/**
  * Program
  */
 addCommand({
@@ -117,6 +227,11 @@ addCommand({
         zipLambdaFunctions(rootFilePath);
         await deploy(config)
     }
+})
+
+addCommand({
+    command: 'init',
+    action: scaffold
 })
 
 runProgram()

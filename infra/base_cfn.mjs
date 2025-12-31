@@ -1,5 +1,7 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { writeFileSync, unlinkSync } from 'fs';
+import { join } from 'path';
 
 const execAsync = promisify(exec);
 
@@ -21,14 +23,28 @@ async function runAwsCommand(command) {
  */
 async function createStack(props) {
     const region = props.region || process.env.AWS_REGION || 'us-east-1';
-    const command = `aws cloudformation create-stack --stack-name ${props.name} --template-body '${props.template}' --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND CAPABILITY_NAMED_IAM --region ${region}`;
-    return await runAwsCommand(command);
+    const tempFile = join(process.cwd(), `temp-${Date.now()}.yaml`);
+    
+    try {
+        writeFileSync(tempFile, props.template);
+        const command = `aws cloudformation create-stack --stack-name ${props.name} --template-body file://${tempFile} --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND CAPABILITY_NAMED_IAM --region ${region}`;
+        return await runAwsCommand(command);
+    } finally {
+        try { unlinkSync(tempFile); } catch {}
+    }
 }
 
 async function updateStack(props) {
     const region = props.region || process.env.AWS_REGION || 'us-east-1';
-    const command = `aws cloudformation update-stack --stack-name ${props.name} --template-body '${props.template}' --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND CAPABILITY_NAMED_IAM --region ${region}`;
-    return await runAwsCommand(command);
+    const tempFile = join(process.cwd(), `temp-${Date.now()}.yaml`);
+    
+    try {
+        writeFileSync(tempFile, props.template);
+        const command = `aws cloudformation update-stack --stack-name ${props.name} --template-body file://${tempFile} --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND CAPABILITY_NAMED_IAM --region ${region}`;
+        return await runAwsCommand(command);
+    } finally {
+        try { unlinkSync(tempFile); } catch {}
+    }
 }
 
 export async function deployStack(props) {
